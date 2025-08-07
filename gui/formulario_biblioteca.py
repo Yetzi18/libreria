@@ -1,7 +1,9 @@
 import tkinter as tk
 from models.biblioteca_modelo import agregar_biblioteca
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 from gui.formulario_libro import crear_libro
+from models.biblioteca_modelo import obtener_bibliotecas2
+
 
 def crear_biblioteca(interfaz):
     interfaz.title("Formulario biblioteca")
@@ -27,9 +29,30 @@ def crear_biblioteca(interfaz):
                 return
             agregar_biblioteca(id_biblioteca, nombre_biblioteca, ubicacion_biblioteca)
             messagebox.showinfo("Mensaje","Biblioteca agregada con éxito!")
+            cargar_bibliotecas()
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
     tk.Button(interfaz, text="Registrar", command=agregar ).grid(row=3, column=1, padx=5, pady=5)
     
     tk.Button(interfaz, text="Agregar libro", command=crear_libro).grid(row=4, column=1, padx=5, pady=5)
+
+    #Vamos a mostrar una tabla 
+    tk.Label(interfaz, text="Listado de bibliotecas").grid(row=5, column=0, columnspan=2)
+    tabla = ttk.Treeview(interfaz, columns=("ID", "Nombre", "Ubicacion"), show="headings")
+    tabla.heading("id", text="Id")
+    tabla.heading("nombre", text="nombre")
+    tabla.heading("ubicacion", text="ubicacio")
+    tabla.grid(row=6, column=0, columnspan= 2, padx=10, pady=5)
+
+    def cargar_bibliotecas():
+        try:
+            bibliotecas = obtener_bibliotecas2()
+            filas = tabla.get_children()
+            for f in filas:
+                tabla.delete(f)
+            for b in bibliotecas:
+                tabla.insert("", "end", values=b)
+        except Exception as ex:
+            messagebox.showerror("ERROR", f"No se pudieron cargar las bibliotecas: {ex}")
+    cargar_bibliotecas()
